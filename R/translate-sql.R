@@ -161,7 +161,7 @@ sql_data_mask <- function(expr,
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
-  unknown <- setdiff(all_calls(expr), names(variant))
+  unknown <- setdiff(all_calls(expr), c(names(variant), "sql"))
   op <- if (strict) missing_op else default_op
   top_env <- ceply(unknown, op, parent = empty_env(), env = get_env(expr))
 
@@ -192,7 +192,7 @@ sql_data_mask <- function(expr,
   special_calls2$sql <- function(...) {
     dots <- exprs(...)
 
-    env <- get_env(expr)
+    env <- get_env(expr, empty_env())
     dots <- purrr::map(dots, eval_tidy, env = env)
 
     exec(sql, !!!dots)
